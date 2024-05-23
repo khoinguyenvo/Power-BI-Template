@@ -1,3 +1,4 @@
+```CSS
 .card {
   width: 440px;
   height: 240px;
@@ -90,3 +91,4 @@ th {
 .icon {
     margin-right: 8px;
 }
+```
