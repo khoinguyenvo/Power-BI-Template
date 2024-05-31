@@ -1,1 +1,397 @@
-
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "usermeta": {
+    "deneb": {
+      "build": "1.6.2.1",
+      "metaVersion": 1,
+      "provider": "vegaLite",
+      "providerVersion": "5.16.3"
+    },
+    "interactivity": {
+      "tooltip": true,
+      "contextMenu": true,
+      "selection": true,
+      "highlight": false,
+      "dataPointLimit": 50
+    },
+    "information": {
+      "name": "Bubble Heatmap with Rows and Columns Cumulative Sum ",
+      "description": "[No Description Provided]",
+      "author": "Khoi Nguyen Vo",
+      "uuid": "eed94383-f7f7-4226-8d87-49dd60dbdd8c",
+      "generated": "2024-05-31T08:54:30.516Z"
+    },
+    "dataset": [
+      {
+        "key": "__0__",
+        "name": "Day of Week Short",
+        "description": "Used as axis labels",
+        "type": "text",
+        "kind": "column"
+      },
+      {
+        "key": "__1__",
+        "name": "Time of Day",
+        "description": "Rounded hours used as axis labels",
+        "type": "text",
+        "kind": "column"
+      },
+      {
+        "key": "__2__",
+        "name": "Day of Week Long",
+        "description": "Used in tooltips",
+        "type": "text",
+        "kind": "column"
+      },
+      {
+        "key": "__3__",
+        "name": "Time of Day Interval",
+        "description": "Used in tooltips",
+        "type": "text",
+        "kind": "column"
+      },
+      {
+        "key": "__4__",
+        "name": "Main metric",
+        "description": "",
+        "type": "numeric",
+        "kind": "measure"
+      }
+    ]
+  },
+  "config": {
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "axis": {
+      "labelFont": "Segoe UI Semibold",
+      "labelAngle": 0,
+      "labelPadding": 8,
+      "labelColor": "#4F5E81",
+      "labelFontSize": 16,
+      "domain": false,
+      "domainColor": "#4F5E81",
+      "domainOpacity": 0.25,
+      "domainWidth": 2,
+      "titleFont": "Segoe UI Semibold",
+      "titleFontSize": 20,
+      "titleColor": "#303638",
+      "tickColor": "#4F5E81",
+      "tickOpacity": 0.25,
+      "tickWidth": 2,
+      "tickCap": "round",
+      "tickSize": 4,
+      "ticks": false,
+      "grid": false
+    },
+    "bar": {
+      "color": "#4F5E81",
+      "stroke": "#4F5E81",
+      "cornerRadiusEnd": 4,
+      "tooltip": true
+    },
+    "circle": {
+      "tooltip": true
+    }
+  },
+  "data": {
+    "name": "dataset"
+  },
+  "params": [
+    {
+      "name": "highlight",
+      "select": {
+        "type": "point",
+        "on": "pointerover"
+      }
+    }
+  ],
+  "spacing": 10,
+  "bounds": "flush",
+  "vconcat": [
+    {
+      "width": 680,
+      "height": 60,
+      "mark": {
+        "type": "bar",
+        "width": 16
+      },
+      "encoding": {
+        "x": {
+          "field": "__1__",
+          "type": "nominal",
+          "sort": {
+            "order": "ascending"
+          },
+          "title": null,
+          "axis": {
+            "labels": false
+          }
+        },
+        "y": {
+          "field": "__4__",
+          "type": "quantitative",
+          "aggregate": "sum",
+          "title": null,
+          "axis": {
+            "labels": false
+          }
+        },
+        "tooltip": [
+          {
+            "field": "__3__",
+            "type": "nominal",
+            "title": "Time of Day:"
+          },
+          {
+            "field": "__4__",
+            "type": "quantitative",
+            "aggregate": "sum",
+            "title": "Number of Passengers:"
+          }
+        ],
+        "color": {
+          "field": "__4__",
+          "type": "quantitative",
+          "aggregate": "sum",
+          "legend": null,
+          "scale": {
+            "type": "linear",
+            "range": [
+              "#e9eaef",
+              "#233661"
+            ]
+          }
+        },
+        "opacity": {
+          "condition": [
+            {
+              "param": "highlight",
+              "empty": false,
+              "value": 1
+            }
+          ],
+          "value": 0.8
+        },
+        "strokeWidth": {
+          "condition": [
+            {
+              "param": "highlight",
+              "empty": false,
+              "value": 1.2
+            }
+          ],
+          "value": 0
+        }
+      }
+    },
+    {
+      "spacing": 10,
+      "bounds": "flush",
+      "hconcat": [
+        {
+          "height": 210,
+          "width": 680,
+          "mark": {
+            "type": "circle",
+            "opacity": 0.8
+          },
+          "encoding": {
+            "y": {
+              "field": "__0__",
+              "type": "nominal",
+              "sort": {
+                "order": "ascending"
+              },
+              "title": "Day of Week →",
+              "axis": {
+                "titleAngle": 90,
+                "titleAnchor": "start",
+                "titlePadding": 40,
+                "titleY": 10,
+                "offset": 20
+              }
+            },
+            "x": {
+              "field": "__1__",
+              "type": "nominal",
+              "sort": {
+                "order": "ascending"
+              },
+              "title": "Time of Day →",
+              "axis": {
+                "orient": "bottom",
+                "titleAnchor": "start",
+                "titleAlign": "left",
+                "labelOverlap": true,
+                "titleX": -10,
+                "titlePadding": 16,
+                "tickCount": 16,
+                "labelFlushOffset": 24,
+                "labelExpr": "[datum.value[0] + datum.value[1],datum.value[0] + datum.value[1]=='12'?datum.value[3] + datum.value[4]:'']"
+              }
+            },
+            "tooltip": [
+              {
+                "field": "__2__",
+                "type": "nominal",
+                "title": "Day of Week:"
+              },
+              {
+                "field": "__3__",
+                "type": "nominal",
+                "title": "Time of Day:"
+              },
+              {
+                "field": "__4__",
+                "type": "quantitative",
+                "aggregate": "sum",
+                "title": "Number of Passengers:"
+              }
+            ],
+            "size": {
+              "field": "__4__",
+              "type": "quantitative",
+              "scale": {
+                "rangeMax": 800
+              },
+              "legend": null
+            },
+            "color": {
+              "field": "__4__",
+              "type": "quantitative",
+              "legend": null,
+              "scale": {
+                "type": "linear",
+                "range": [
+                  "#e9eaef",
+                  "#233661"
+                ]
+              }
+            },
+            "opacity": {
+              "condition": [
+                {
+                  "param": "highlight",
+                  "empty": false,
+                  "value": 1
+                }
+              ],
+              "value": 0.8
+            },
+            "stroke": {
+              "condition": [
+                {
+                  "param": "highlight",
+                  "empty": false,
+                  "value": "#4F5E81"
+                }
+              ],
+              "value": "transparent"
+            },
+            "strokeWidth": {
+              "condition": [
+                {
+                  "param": "highlight",
+                  "empty": false,
+                  "value": 1.2
+                }
+              ],
+              "value": 0
+            }
+          }
+        },
+        {
+          "height": 210,
+          "width": 60,
+          "mark": {
+            "type": "bar",
+            "height": 16
+          },
+          "encoding": {
+            "y": {
+              "field": "__0__",
+              "type": "nominal",
+              "title": null,
+              "axis": {
+                "labels": false
+              },
+              "sort": {
+                "order": "ascending"
+              }
+            },
+            "x": {
+              "field": "__4__",
+              "type": "quantitative",
+              "aggregate": "sum",
+              "title": null,
+              "axis": {
+                "labels": false
+              }
+            },
+            "tooltip": [
+              {
+                "field": "__2__",
+                "type": "nominal",
+                "title": "Day of Week:"
+              },
+              {
+                "field": "__4__",
+                "type": "quantitative",
+                "aggregate": "sum",
+                "title": "Number of Passengers:"
+              }
+            ],
+            "color": {
+              "field": "__4__",
+              "type": "quantitative",
+              "aggregate": "sum",
+              "legend": null,
+              "scale": {
+                "type": "linear",
+                "range": [
+                  "#e9eaef",
+                  "#233661"
+                ]
+              }
+            },
+            "opacity": {
+              "condition": [
+                {
+                  "param": "highlight",
+                  "empty": false,
+                  "value": 1
+                }
+              ],
+              "value": 0.8
+            },
+            "strokeWidth": {
+              "condition": [
+                {
+                  "param": "highlight",
+                  "empty": false,
+                  "value": 1.2
+                }
+              ],
+              "value": 0
+            }
+          }
+        }
+      ],
+      "resolve": {
+        "scale": {
+          "color": "independent"
+        }
+      }
+    }
+  ],
+  "resolve": {
+    "scale": {
+      "color": "independent"
+    }
+  }
+}
