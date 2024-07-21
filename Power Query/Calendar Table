@@ -4,66 +4,66 @@ let
     #"Renamed Columns" = Table.RenameColumns(#"Converted to Table",{{"Column1", "Date"}}),
     #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Date", type date}}),
     StartDate = #date(2023, 1, 1),
-    Today = #date(2024, 7, 19),
-    Length = Duration.Days(Today - StartDate),
-    Custom1 = #"Changed Type",
-    #"Inserted Year" = Table.AddColumn(Custom1, "Year", each Date.Year([Date]), Int64.Type),
-    #"Inserted Month Name" = Table.AddColumn(#"Inserted Year", "Month Name", each Date.MonthName([Date]), type text),
-    #"Inserted Day Name" = Table.AddColumn(#"Inserted Month Name", "Day Name", each Date.DayOfWeekName([Date]), type text),
-    #"Inserted Month" = Table.AddColumn(#"Inserted Day Name", "Month", each Date.Month([Date]), Int64.Type),
-    #"Inserted Day of Week" = Table.AddColumn(#"Inserted Month", "Day of Week", each Date.DayOfWeek(([Date]), Day.Monday)+1, Int64.Type),
-    #"Inserted First Characters" = Table.AddColumn(#"Inserted Day of Week", "MMM", each Text.Start([Month Name], 3), type text),
-    #"Inserted First Characters1" = Table.AddColumn(#"Inserted First Characters", "DDD", each Text.Start([Day Name], 3), type text),
-    #"Reordered Columns" = Table.ReorderColumns(#"Inserted First Characters1",{"Date", "Year", "Month Name", "MMM", "Month", "Day Name", "DDD", "Day of Week"}),
-    #"Added Custom" = Table.AddColumn(#"Reordered Columns", "YYMM", each ([Year]-2000)*100 + [Month]),
-    #"Added Custom1" = Table.AddColumn(#"Added Custom", "MonthID", each (Date.Year([Date]) - Date.Year(StartDate))*12 + Date.Month([Date])),
-    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "DayMonthText", each Date.ToText( [Date], [Format = "dd MMM" ] )),
-    #"Added Custom3" = Table.AddColumn(#"Added Custom2", "DayMonthInt", each Date.ToText( [Date], [Format = "dd" ] )),
-    #"Added Custom4" = Table.AddColumn(#"Added Custom3", "YearMonthShort", each Text.Combine( 
-    {
-        Date.ToText( [Date], [Format = "MMM" ] ),
-        Date.ToText( [Date], [Format = "yy" ] )
-    }, 
-    "'" 
-)),
-    #"Added Custom5" = Table.AddColumn(#"Added Custom4", "YearMonthLong", each Text.Combine( 
-    {   Date.ToText( [Date], [Format = "yyyy" ] ),
-        Date.ToText( [Date], [Format = "MMMM" ] )
-    }, 
-    " " 
-)),
-    #"Added Custom6" = Table.AddColumn(#"Added Custom5", "QuarterInt", each Date.QuarterOfYear([Date])),
-    #"Added Custom7" = Table.AddColumn(#"Added Custom6", "QuarterText", each Text.Combine( {"Q", Text.From([QuarterInt]) }, "" )),
-    #"Added Custom8" = Table.AddColumn(#"Added Custom7", "WeekOfYearInt", each Date.WeekOfYear([Date])),
-    #"Added Custom10" = Table.AddColumn(#"Added Custom8", "WeekOfYearText", each Text.Combine(
+    EndDate = #date(2024, 7, 18),
+    Length = Duration.Days(EndDate - StartDate) + 1,
+    #"Added Date" = #"Changed Type",
+    #"Added Year" = Table.AddColumn(#"Added Date", "Year", each Date.Year([Date]), Int64.Type),
+    #"Added Week Day Long" = Table.AddColumn(#"Added Year", "WeekDayLong", each Date.DayOfWeekName([Date]), type text),
+    #"Added Week Day Short" = Table.AddColumn(#"Added Week Day Long", "WeekDayShort", each Text.Start([WeekDayLong], 3), type text),
+    #"Added Week Day Number" = Table.AddColumn(#"Added Week Day Short", "Day of Week", each Date.DayOfWeek(([Date]), Day.Monday)+1, Int64.Type),
+    #"Added Day Month Number" = Table.AddColumn(#"Added Week Day Number", "DayMonthInt", each Date.ToText( [Date], [Format = "dd" ] )),
+    #"Added Day Month Text" = Table.AddColumn(#"Added Day Month Number", "DayMonthText", each Date.ToText( [Date], [Format = "dd MMM" ] )),
+    #"Added Week of Month" = Table.AddColumn(#"Added Day Month Text", "WeekOfMonth", each Date.WeekOfMonth( [Date] )),
+    #"Added Week of Year Number" = Table.AddColumn(#"Added Week of Month", "WeekOfYearInt", each Date.WeekOfYear([Date])),
+    #"Added Week of Year Text" = Table.AddColumn(#"Added Week of Year Number", "WeekOfYearText", each Text.Combine(
     {
       "W",
       Text.From([WeekOfYearInt])
     },
     ""
 )),
-    #"Added Custom9" = Table.AddColumn(#"Added Custom10", "WeekOfMonth", each Date.WeekOfMonth( [Date] )),
-    #"Added Custom11" = Table.AddColumn(#"Added Custom9", "YearQuarter", each Text.Combine( 
+    #"Added Week Offset" = Table.AddColumn(#"Added Week of Year Text", "WeekOffset", each (Date.StartOfWeek([Date])
+-Date.StartOfWeek(List.Max(#"Added Week of Year Number"[Date])))/7),
+    #"Added Month Long" = Table.AddColumn(#"Added Week Offset", "MonthLong", each Date.MonthName([Date]), type text),
+    #"Added Month Short" = Table.AddColumn(#"Added Month Long", "MonthShort", each Text.Start([MonthLong], 3), type text),
+    #"Added Month Number" = Table.AddColumn(#"Added Month Short", "MonthInt", each Date.Month([Date]), Int64.Type),
+    #"Added Month Offset" = Table.AddColumn(#"Added Month Number", "MonthOffset", each (([Year]-Date.Year(List.Max(#"Added Month Short"[Date])))*12)
++([MonthInt]-Date.Month(List.Max(#"Added Month Short"[Date])))),
+    #"Added Year Month Number" = Table.AddColumn(#"Added Month Offset", "YearMonthInt", each [Year]*100 + [MonthInt]),
+    #"Added Year Month Short" = Table.AddColumn(#"Added Year Month Number", "YearMonthShort", each Text.Combine( 
+    {
+        Date.ToText( [Date], [Format = "MMM" ] ),
+        Date.ToText( [Date], [Format = "yy" ] )
+    }, 
+    "'" 
+)),
+    #"Added Year Month Long" = Table.AddColumn(#"Added Year Month Short", "YearMonthLong", each Text.Combine( 
+    {   Date.ToText( [Date], [Format = "yyyy" ] ),
+        Date.ToText( [Date], [Format = "MMMM" ] )
+    }, 
+    " " 
+)),
+    #"Added Quarter Number" = Table.AddColumn(#"Added Year Month Long", "QuarterInt", each Date.QuarterOfYear([Date])),
+    #"Added Quarter Text" = Table.AddColumn(#"Added Quarter Number", "QuarterText", each Text.Combine( {"Q", Text.From([QuarterInt]) }, "" )),
+    #"Added Quarter Offset" = Table.AddColumn(#"Added Quarter Text", "QuarterOffset", each (([Year]-Date.Year(List.Max(#"Added Year Month Long"[Date])))*4)
++([QuarterInt]-Date.QuarterOfYear(List.Max(#"Added Year Month Long"[Date])))),
+    #"Added Year Quarter Text" = Table.AddColumn(#"Added Quarter Offset", "YearQuarterText", each Text.Combine( 
     {
         [QuarterText],
         Date.ToText( [Date], [Format = "yy" ] )
     }, 
     "'" 
 )),
-    #"Added Custom12" = Table.AddColumn(#"Added Custom11", "Custom", each Text.Combine( 
+    #"Added Year Quarter Number" = Table.AddColumn(#"Added Year Quarter Text", "YearQuarterInt", each Text.Combine( 
     {
-        Date.ToText( [Date], [Format = "yyyy" ] ),
+        Date.ToText( [Date], [Format = "yyyy" ] ), "0",
         Text.From([QuarterInt])
     }, 
     "" 
 )),
-    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom12",{{"Custom", Int64.Type}}),
-    #"Changed Type1" = Table.TransformColumnTypes(#"Changed Type3",{{"DayMonthInt", Int64.Type}}),
-    #"Sorted Rows" = Table.Sort(#"Changed Type1",{{"Date", Order.Descending}}),
-    #"Renamed Columns1" = Table.RenameColumns(#"Sorted Rows",{{"Month Name", "MonthLong"}, {"MMM", "MonthShort"}, {"Month", "MonthInt"}, {"Day Name", "DayLong"}, {"DDD", "DayShort"}, {"Day of Week", "DayInt"}}),
-    #"Reordered Columns1" = Table.ReorderColumns(#"Renamed Columns1",{"Date", "DayMonthInt", "DayMonthText", "Year", "MonthLong", "MonthShort", "MonthInt", "DayLong", "DayShort", "DayInt", "YYMM", "MonthID"}),
-    #"Changed Type2" = Table.TransformColumnTypes(#"Reordered Columns1",{{"QuarterInt", Int64.Type}}),
-    #"Sorted Rows1" = Table.Sort(#"Changed Type2",{{"Date", Order.Descending}}),
-    #"Renamed Columns2" = Table.RenameColumns(#"Sorted Rows1",{{"Custom", "YearQuarterInt"}, {"DayLong", "WeekDayLong"}, {"DayShort", "WeekDayShort"}, {"DayInt", "WeekDayInt"}})
+    #"Added Year Offset" = Table.AddColumn(#"Added Year Quarter Number", "YearOffset", each [Year]-Date.Year(List.Max(#"Added Year Quarter Text"[Date]))),
+    #"Reordered Columns" = Table.ReorderColumns(#"Added Year Offset",{"Date", "WeekDayLong", "WeekDayShort", "Day of Week", "DayMonthInt", "DayMonthText", "WeekOfMonth", "WeekOfYearInt", "WeekOfYearText", "WeekOffset", "MonthLong", "MonthShort", "MonthInt", "MonthOffset", "YearMonthInt", "YearMonthShort", "YearMonthLong", "QuarterInt", "QuarterText", "QuarterOffset", "YearQuarterText", "YearQuarterInt", "Year", "YearOffset"}),
+    #"Correct Data Types" = Table.TransformColumnTypes(#"Reordered Columns",{{"Day of Week", Int64.Type}, {"DayMonthInt", Int64.Type}, {"WeekOfMonth", Int64.Type}, {"WeekOfYearInt", Int64.Type}, {"WeekOffset", Int64.Type}, {"MonthInt", Int64.Type}, {"MonthOffset", Int64.Type}, {"YearMonthInt", Int64.Type}, {"QuarterInt", Int64.Type}, {"QuarterOffset", Int64.Type}, {"YearQuarterInt", Int64.Type}, {"YearOffset", Int64.Type}, {"Year", Int64.Type}, {"WeekDayLong", type text}, {"WeekDayShort", type text}, {"DayMonthText", type text}, {"WeekOfYearText", type text}, {"MonthLong", type text}, {"MonthShort", type text}, {"YearMonthShort", type text}, {"YearMonthLong", type text}, {"QuarterText", type text}, {"YearQuarterText", type text}}),
+    #"Sort Date Descending" = Table.Sort(#"Correct Data Types",{{"Date", Order.Descending}})
 in
-    #"Renamed Columns2"
+    #"Sort Date Descending"
