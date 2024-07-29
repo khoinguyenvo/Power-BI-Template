@@ -31,14 +31,7 @@ SWITCH(
 )
 
 -- CREATE HTML IMAGE OF MONTH OVER MONTH VARIANCE
-VAR HTMLCode = 
-"
-<div xmlns='http://www.w3.org/1999/xhtml'>
-    <span xmlns='http://www.w3.org/1999/xhtml' style='vertical-align: middle; font-size: 14px'>
-    "&SUBSTITUTE(Arrow,"fillcolor",Color)&"
-    </span>
-</div>
-"
+VAR HTMLCode =  "<div xmlns='http://www.w3.org/1999/xhtml'>"&SUBSTITUTE(Arrow,"fillcolor",Color)&"</div>"
 
 -- FINAL SVG IMAGE CODE
 VAR SVGImage = 
